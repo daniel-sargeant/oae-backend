@@ -2,10 +2,12 @@ const express = require("express");
 const { pool } = require("./client");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const morgan = require("morgan");
 
 const app = express();
 const port = 3000;
 
+app.use(morgan("short"));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(
