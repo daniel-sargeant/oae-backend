@@ -25,6 +25,18 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/published", (req, res) => {
+  pool.query(
+    "SELECT * FROM posts WHERE published = true;",
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      res.status(200).json(results.rows);
+    }
+  );
+});
+
 app.post("/", (req, res) => {
   if (req.body.content?.length) {
     const client = async () => await pool.connect();
@@ -44,13 +56,17 @@ app.post("/", (req, res) => {
       });
     } else {
       client().then((x) => {
-        const transactionText = `INSERT INTO posts(content, created_at) VALUES ($1, NOW()) RETURNING *`;
-        x.query(transactionText, [req.body.content], (error, results) => {
-          if (error) {
-            throw error;
+        const transactionText = `INSERT INTO posts(content, published, preoccupations, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *`;
+        x.query(
+          transactionText,
+          [req.body.content, req.body.published, req.body.preoccupations],
+          (error, results) => {
+            if (error) {
+              throw error;
+            }
+            res.status(200).json(results.rows[0]);
           }
-          res.status(200).json(results.rows[0]);
-        });
+        );
       });
     }
   }
