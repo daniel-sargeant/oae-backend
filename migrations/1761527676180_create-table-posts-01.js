@@ -1,6 +1,6 @@
 exports.up = (pgm) => {
   pgm.createTable("posts", {
-    id: "id",
+    id: { type: "uuid", primaryKey: true },
     content: { type: "text", notNull: true },
     created_at: {
       type: "timestamp",
